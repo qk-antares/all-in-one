@@ -1,0 +1,53 @@
+version: '3.5'
+
+# 服务容器配置
+services:
+  dev-env:
+    build:
+      context: ./dev-env                  # 指定构建使用的 Dockerfile 文件
+    image: dev-env:1.0
+    container_name: dev-env
+    environment:                         # 设置环境变量
+      - TZ=${TZ}
+    privileged: true
+    volumes:
+      - ${CODE_PATH}:/root/workplace
+      - /root/.ssh:/root/.ssh
+      - ${CONF_PATH}/hosts:/etc/hosts
+    ports:
+      - "2222:22"
+      - "8000-8060:8000-8060"
+    command: ["/etc/init.d/ssh", "start", "-D"]
+    stdin_open: true                     # 打开标准输入，可以接受外部输入
+    tty: true
+    restart: unless-stopped                      # 指定容器退出后的重启策略为始终重启
+  
+  jellyfin:
+    build:
+      context: ./jellyfin
+    image: jellyfin:1.0
+    container_name: jellyfin
+    ports:
+      - 8096:8096
+      - 8920:8920
+    volumes:
+      - /docker/videos/jellyfin/config:/config
+      - /docker/videos/jellyfin/cache:/cache
+      - /docker/videos/jellyfin/media:/media
+    environment:
+      - TZ=${TZ}
+      - PUID=0
+      - PGID=0
+    devices:
+      - /dev/dri:/dev/dri
+    extra_hosts:
+      - api.themoviedb.org:13.224.161.90
+      - api.themoviedb.org:13.35.8.65
+      - api.themoviedb.org:13.35.8.93
+      - api.themoviedb.org:13.35.8.6
+      - api.themoviedb.org:13.35.8.54
+      - image.tmdb.org:138.199.37.230
+      - image.tmdb.org:108.138.246.49
+      - api.thetvdb.org:13.225.89.239
+      - api.thetvdb.org:192.241.234.54
+    restart: unless-stopped
