@@ -20,6 +20,7 @@ services:
     command: ["/etc/init.d/ssh", "start", "-D"]
     stdin_open: true                     # 打开标准输入，可以接受外部输入
     tty: true
+    network_mode: bridge
     restart: unless-stopped                      # 指定容器退出后的重启策略为始终重启
   
   xunlei:
@@ -30,8 +31,9 @@ services:
     ports:
       - 2345:2345
     volumes:
-      - /docker/videos/xunlei/data:/mnt/sdb1/xunlei #data目录
-      - /docker/videos/xunlei/downloads:/mnt/sdb1/downloads #下载目录
+      - /docker/videos/xunlei/data:/xunlei/data #data目录
+      - /docker/videos/xunlei/downloads:/xunlei/downloads #下载目录
+    network_mode: bridge
     restart: unless-stopped
 
   jellyfin:
@@ -62,4 +64,5 @@ services:
       - image.tmdb.org:108.138.246.49
       - api.thetvdb.org:13.225.89.239
       - api.thetvdb.org:192.241.234.54
+    network_mode: bridge
     restart: unless-stopped
